@@ -1,11 +1,10 @@
 'use client'
-// src/app/auth/signup/page.tsx
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 const JOIN_CODE = 'kappa2026'
 
-export default function SignupPage() {
+function SignupForm() {
   const [step, setStep] = useState<'verify' | 'register'>('verify')
   const [code, setCode] = useState('')
   const [fullName, setFullName] = useState('')
@@ -51,12 +50,12 @@ export default function SignupPage() {
     return (
       <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'var(--bg)', padding:'24px' }}>
         <div style={{ width:'100%', maxWidth:'400px', background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'16px', padding:'36px', textAlign:'center' }}>
-          <div style={{ fontFamily:'var(--font-serif)', fontSize:'32px', color:'var(--accent)', letterSpacing:'4px', marginBottom:'20px' }}>ΚΑΠ</div>
+          <div style={{ fontFamily:'var(--font-serif)', fontSize:'32px', color:'var(--accent3)', letterSpacing:'4px', marginBottom:'20px' }}>ΚΑΠ</div>
           <div style={{ fontSize:'18px', color:'var(--green)', marginBottom:'12px' }}>✓ Check your email</div>
           <div style={{ fontSize:'13px', color:'var(--muted)', lineHeight:'1.7' }}>
             We sent a confirmation link to <strong style={{ color:'var(--text)' }}>{email}</strong>. Click it to activate your account.
           </div>
-          <a href="/auth/login" style={{ display:'block', marginTop:'24px', color:'var(--accent)', fontSize:'13px', textDecoration:'none' }}>Back to login →</a>
+          <a href="/auth/login" style={{ display:'block', marginTop:'24px', color:'var(--accent3)', fontSize:'13px', textDecoration:'none' }}>Back to login →</a>
         </div>
       </div>
     )
@@ -66,7 +65,7 @@ export default function SignupPage() {
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'var(--bg)', padding:'24px' }}>
       <div style={{ width:'100%', maxWidth:'400px', background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'16px', padding:'36px' }}>
         <div style={{ textAlign:'center', marginBottom:'28px' }}>
-          <div style={{ fontFamily:'var(--font-serif)', fontSize:'32px', color:'var(--accent)', letterSpacing:'4px', marginBottom:'6px' }}>ΚΑΠ</div>
+          <div style={{ fontFamily:'var(--font-serif)', fontSize:'32px', color:'var(--accent3)', letterSpacing:'4px', marginBottom:'6px' }}>ΚΑΠ</div>
           <div style={{ fontSize:'11px', color:'var(--muted)', letterSpacing:'2px', textTransform:'uppercase' }}>
             {step === 'verify' ? 'Member Access' : 'Create Account'}
           </div>
@@ -87,7 +86,6 @@ export default function SignupPage() {
                 onChange={e => setCode(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && verifyAccess()}
                 autoFocus
-                style={{ letterSpacing: code ? '3px' : '0', fontFamily: code ? 'monospace' : 'inherit' }}
               />
             </div>
             {error && (
@@ -97,7 +95,7 @@ export default function SignupPage() {
             )}
             <button className="btn btn-primary" style={{ width:'100%', padding:'11px' }} onClick={verifyAccess}>Continue →</button>
             <div style={{ textAlign:'center', marginTop:'18px', fontSize:'12px', color:'var(--muted)' }}>
-              Already a member? <a href="/auth/login" style={{ color:'var(--accent)', textDecoration:'none' }}>Sign in</a>
+              Already a member? <a href="/auth/login" style={{ color:'var(--accent3)', textDecoration:'none' }}>Sign in</a>
             </div>
           </>
         )}
@@ -111,11 +109,6 @@ export default function SignupPage() {
             <div style={{ marginBottom:'14px' }}>
               <label className="form-label">Email</label>
               <input className="form-input" type="email" placeholder="netid@illinois.edu" value={email} onChange={e => setEmail(e.target.value)} />
-              {email && !email.endsWith('@illinois.edu') && (
-                <div style={{ fontSize:'11px', color:'var(--amber)', marginTop:'5px' }}>
-                  Tip: use your @illinois.edu email.
-                </div>
-              )}
             </div>
             <div style={{ marginBottom:'14px' }}>
               <label className="form-label">Password</label>
@@ -147,5 +140,13 @@ export default function SignupPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: 'var(--bg)' }} />}>
+      <SignupForm />
+    </Suspense>
   )
 }
