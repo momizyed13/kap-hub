@@ -11,7 +11,7 @@ function LoginForm() {
   const router = useRouter()
   const params = useSearchParams()
   const next = params.get('next') || '/dashboard/listings'
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
 
   async function handleLogin() {
     setLoading(true)

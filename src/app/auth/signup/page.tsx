@@ -14,7 +14,7 @@ function SignupForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
 
   function verifyAccess() {
     setError(null)
