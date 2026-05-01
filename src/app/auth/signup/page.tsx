@@ -143,6 +143,8 @@ function SignupForm() {
   )
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function SignupPage() {
   return (
     <Suspense fallback={<div style={{ minHeight: '100vh', background: 'var(--bg)' }} />}>
