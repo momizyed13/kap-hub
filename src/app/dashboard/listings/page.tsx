@@ -1,10 +1,10 @@
 // src/app/dashboard/listings/page.tsx
+// Auth is in middleware. Page just fetches and renders.
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import ListingsClient from './ListingsClient'
 
 export const dynamic = 'force-dynamic'
-export const revalidate = 30
+export const revalidate = 0
 
 export default async function ListingsPage({
   searchParams,
@@ -14,8 +14,13 @@ export default async function ListingsPage({
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  // If no user (shouldn't happen due to middleware, but defensive), render empty state
   if (!user) {
-    redirect('/auth/login')
+    return (
+      <div style={{ padding: '40px', color: 'var(--muted)', textAlign: 'center' }}>
+        <p>Session expired. <a href="/auth/login" style={{ color: 'var(--accent3)' }}>Sign in again</a></p>
+      </div>
+    )
   }
 
   let query = supabase
@@ -45,8 +50,8 @@ export default async function ListingsPage({
     .eq('user_id', user.id)
 
   const savedIds = (saved ?? []).map((s: any) => s.listing_id)
-
   const all = listings ?? []
+
   const stats = {
     total: all.length,
     newThisWeek: all.filter((l: any) => {
