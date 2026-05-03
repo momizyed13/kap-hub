@@ -1,7 +1,6 @@
 // src/app/dashboard/listings/page.tsx
-// Server component with category filter support
-
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import ListingsClient from './ListingsClient'
 
 export const dynamic = 'force-dynamic'
@@ -16,7 +15,7 @@ export default async function ListingsPage({
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return null
+    redirect('/auth/login')
   }
 
   let query = supabase
@@ -60,7 +59,6 @@ export default async function ListingsPage({
     remote: all.filter((l: any) => l.remote).length,
   }
 
-  // Count by category for the filter pills
   const byCategory = all.reduce((acc: Record<string, number>, l: any) => {
     const cat = l.category || 'Legal'
     acc[cat] = (acc[cat] ?? 0) + 1
