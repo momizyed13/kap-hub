@@ -1,6 +1,6 @@
 // src/app/dashboard/listings/page.tsx
-// Auth is in middleware. Page just fetches and renders.
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import ListingsClient from './ListingsClient'
 
 export const dynamic = 'force-dynamic'
@@ -14,13 +14,8 @@ export default async function ListingsPage({
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // If no user (shouldn't happen due to middleware, but defensive), render empty state
   if (!user) {
-    return (
-      <div style={{ padding: '40px', color: 'var(--muted)', textAlign: 'center' }}>
-        <p>Session expired. <a href="/auth/login" style={{ color: 'var(--accent3)' }}>Sign in again</a></p>
-      </div>
-    )
+    redirect('/auth/login')
   }
 
   let query = supabase
@@ -39,17 +34,20 @@ export default async function ListingsPage({
   if (searchParams.remote === 'true') query = query.eq('remote', true)
 
   const { data: listings, error } = await query
-
-  if (error) {
-    console.error('Listings query failed:', error)
-  }
+  if (error) console.error('Listings query failed:', error)
 
   const { data: saved } = await supabase
     .from('saved_listings')
     .select('listing_id')
     .eq('user_id', user.id)
 
+  const { data: applied } = await supabase
+    .from('applications')
+    .select('listing_id')
+    .eq('user_id', user.id)
+
   const savedIds = (saved ?? []).map((s: any) => s.listing_id)
+  const appliedIds = (applied ?? []).map((a: any) => a.listing_id)
   const all = listings ?? []
 
   const stats = {
@@ -74,6 +72,7 @@ export default async function ListingsPage({
     <ListingsClient
       listings={all as any}
       savedIds={savedIds}
+      appliedIds={appliedIds}
       userId={user.id}
       stats={stats}
       byCategory={byCategory}
